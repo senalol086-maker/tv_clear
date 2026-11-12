@@ -1,0 +1,139 @@
+MiniTV/
+├─ settings.gradle.kts
+├─ build.gradle.kts
+├─ app/
+│  ├─ build.gradle.kts
+│  ├─ proguard-rules.pro
+│  └─ src/main/
+│     ├─ AndroidManifest.xml
+│     ├─ java/com/example/minitv/MainActivity.kt
+│     └─ res/
+│        ├─ layout/activity_main.xml, item_dock.xml, item_app_row.xml
+│        ├─ values/strings.xml, themes.xml
+│        ├─ color/dock_label.xml
+│        ├─ animator/focus_scale.xml
+│        └─ drawable/bg.xml, dock_panel.xml, dock_item_bg.xml, hero_bg.xml,
+│                   row_bg.xml, ic_grid.xml, ic_launcher.xml, banner.xml
+pluginManagement {
+    repositories { google(); mavenCentral(); gradlePluginPortal() }
+}
+dependencyResolutionManagement {
+    repositories { google(); mavenCentral() }
+}
+rootProject.name = "MiniTV"
+include(":app")
+
+pluginManagement {
+    repositories { google(); mavenCentral(); gradlePluginPortal() }
+}
+dependencyResolutionManagement {
+    repositories { google(); mavenCentral() }
+}
+rootProject.name = "MiniTV"
+include(":app")
+build.gradle.kts (корень)
+
+plugins {
+    id("com.android.application") version "8.5.2" apply false
+    id("org.jetbrains.kotlin.android") version "2.0.20" apply false
+}
+app/build.gradle.kts
+
+plugins {
+    id("com.android.application")
+    id("org.jetbrains.kotlin.android")
+}
+
+android {
+    namespace = "com.example.minitv"
+    compileSdk = 34
+
+    defaultConfig {
+        applicationId = "com.example.minitv"
+        minSdk = 21
+        targetSdk = 34
+        versionCode = 1
+        versionName = "1.0"
+    }
+
+    buildTypes {
+        release {
+            isMinifyEnabled = true      // R8: лёгкий APK
+            isShrinkResources = true
+            proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
+        }
+    }
+    compileOptions {
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
+    }
+    kotlinOptions { jvmTarget = "17" }
+}
+
+dependencies { /* намеренно пусто — никаких библиотек */ }
+app/proguard-rules.pro
+
+
+app/src/main/AndroidManifest.xml
+
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <uses-feature android:name="android.software.leanback" android:required="true" />
+    <uses-feature android:name="android.hardware.touchscreen" android:required="false" />
+
+    <!-- Видимость пакетов на Android 11+ без QUERY_ALL_PACKAGES -->
+    <queries>
+        <intent>
+            <action android:name="android.intent.action.MAIN" />
+            <category android:name="android.intent.category.LAUNCHER" />
+        </intent>
+        <intent>
+            <action android:name="android.intent.action.MAIN" />
+            <category android:name="android.intent.category.LEANBACK_LAUNCHER" />
+        </intent>
+    </queries>
+
+    <application
+        android:allowBackup="false"
+        android:banner="@drawable/banner"
+        android:icon="@drawable/ic_launcher"
+        android:label="@string/app_name"
+        android:hardwareAccelerated="true"
+        android:enableOnBackInvokedCallback="false"
+        android:theme="@style/Theme.MiniTV">
+
+        <activity
+            android:name=".MainActivity"
+            android:exported="true"
+            android:launchMode="singleTask"
+            android:clearTaskOnLaunch="true"
+            android:screenOrientation="landscape"
+            android:configChanges="orientation|screenSize|keyboardHidden|uiMode"
+            android:defaultFocusHighlightEnabled="false">
+
+            <!-- HOME: замена стандартного лаунчера -->
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.HOME" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+
+            <!-- Виден в списке приложений Android TV -->
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LEANBACK_LAUNCHER" />
+            </intent-filter>
+        </activity>
+    </application>
+</manifest>
+Код Activity
+app/src/main/java/com/example/minitv/MainActivity.kt
+
+package com.example.minitv
+
+import android.app.Activity
+import android.content.ActivityNotFoundException
+import android.content.Intent
+import android.content.pm.ResolveInfo
+import 
